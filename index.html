@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Diwali 2026 👑</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+
+<canvas id="sky"></canvas>
+
+<audio id="music" src="music.mp3" loop></audio>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="brand">👑 ROYAL DIWALI</div>
+
+    <div class="nav-actions">
+        <button onclick="toggleMusic()" id="musicButton">🎵 Music</button>
+        <button onclick="toggleTheme()" id="themeButton">🌙 Theme</button>
+        <button onclick="openCard()">🎴 Create Card</button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+
+    <div class="royal-tag">✦ THE GRAND FESTIVAL OF LIGHTS ✦</div>
+
+    <h1>Happy <span>Diwali</span></h1>
+
+    <p class="hero-description">
+        A night of lights, a sky full of dreams,
+        and a heart full of happiness.
+    </p>
+
+    <div class="hero-diyas">🪔 ✨ 🪔 ✨ 🪔</div>
+
+    <div id="liveClock"></div>
+
+    <div class="hero-buttons">
+        <button class="gold-btn" onclick="startCelebration()">
+            🎆 CELEBRATE DIWALI
+        </button>
+
+        <button class="outline-btn" onclick="openCard()">
+            🎴 CREATE YOUR CARD
+        </button>
+    </div>
+
+    <p class="hint">Scroll down to explore the royal celebration ↓</p>
+</header>
+
+<!-- MUSIC PANEL -->
+<section class="music-panel">
+    <div>
+        <h2>🎵 Royal Music Lounge</h2>
+        <p>Enjoy the festive atmosphere.</p>
+    </div>
+
+    <div class="music-controls">
+        <button class="gold-btn" onclick="toggleMusic()">▶ / ⏸</button>
+        <label for="volume">Volume</label>
+        <input type="range" id="volume" min="0" max="1"
+               step="0.05" value="0.5">
+    </div>
+</section>
+
+<!-- MAIN FEATURES -->
+<section class="section">
+    <div class="section-heading">✦ EXPLORE THE MAGIC ✦</div>
+    <h2>Royal Celebrations</h2>
+    <p class="muted">Choose an experience and make this Diwali unforgettable.</p>
+
+    <div class="feature-grid">
+
+        <article class="feature">
+            <div class="feature-icon">🎆</div>
+            <h3>Skyshot Show</h3>
+            <p>Launch colourful fireworks across the night sky.</p>
+            <button onclick="startCelebration()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">🪔</div>
+            <h3>Divine Diyas</h3>
+            <p>Light the lamps and fill the night with warmth.</p>
+            <button onclick="lightDiyas()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">🎨</div>
+            <h3>Royal Rangoli</h3>
+            <p>Discover colourful traditional decorations.</p>
+            <button onclick="showRangoli()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">🎁</div>
+            <h3>Surprise Gift</h3>
+            <p>Open a special festive surprise.</p>
+            <button onclick="openGift()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">💌</div>
+            <h3>Diwali Wishes</h3>
+            <p>Generate beautiful greetings for everyone.</p>
+            <button onclick="newWish()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">🎴</div>
+            <h3>Greeting Card</h3>
+            <p>Create and download your own royal card.</p>
+            <button onclick="openCard()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">✨</div>
+            <h3>Golden Particles</h3>
+            <p>Enjoy a magical shower of golden sparkles.</p>
+            <button onclick="toggleParticles()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">🌟</div>
+            <h3>Wish Fountain</h3>
+            <p>Release a fountain of glowing stars.</p>
+            <button onclick="wishFountain()">Explore →</button>
+        </article>
+
+        <article class="feature">
+            <div class="feature-icon">🔔</div>
+            <h3>Celebration Bell</h3>
+            <p>Play a festive bell sound.</p>
+            <button onclick="ringBell()">Explore →</button>
+        </article>
+
+    </div>
+</section>
+
+<!-- DIWALI MESSAGE -->
+<section class="section">
+    <div class="section-heading">✦ FESTIVE BLESSINGS ✦</div>
+    <h2>Words of Happiness</h2>
+
+    <div class="wish-card">
+        <div class="feature-icon">🌸</div>
+        <p id="wishText">
+            May this Diwali bring endless happiness,
+            prosperity and success into your life.
+        </p>
+        <button class="gold-btn" onclick="newWish()">Generate New Wish</button>
+        <button class="outline-btn" onclick="shareWish()">Share Wish</button>
+    </div>
+</section>
+
+<!-- SPECIAL DISPLAY -->
+<section class="section display-section" id="displaySection" hidden>
+    <div class="section-heading">✦ SPECIAL EXPERIENCE ✦</div>
+    <h2 id="displayTitle"></h2>
+    <div id="displayContent"></div>
+</section>
+
+<!-- CARD MODAL -->
+<div class="modal" id="cardModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeCard()">✕</button>
+
+        <div class="feature-icon">🎴</div>
+        <h2>Create Your Royal Card</h2>
+        <p>Make a personalized Diwali greeting card.</p>
+
+        <input id="cardInput" maxlength="40"
+               placeholder="Enter your name">
+
+        <label for="cardStyle">Choose card design</label>
+
+        <select id="cardStyle">
+            <option value="gold">Royal Golden</option>
+            <option value="purple">Royal Purple</option>
+            <option value="red">Traditional Red</option>
+        </select>
+
+        <button class="gold-btn" onclick="createCard()">
+            Create My Card ✨
+        </button>
+    </div>
+</div>
+
+<!-- GENERATED CARD -->
+<section id="cardArea" hidden>
+    <div id="greetingCard">
+        <div class="card-ornament">👑 ✦ 🪔 ✦ 👑</div>
+        <p class="card-label">A SPECIAL GREETING FOR</p>
+        <h2>HAPPY DIWALI</h2>
+        <h3 id="generatedName"></h3>
+        <p>
+            May your home shine with happiness,
+            your heart glow with peace, and
+            your life sparkle with success.
+        </p>
+        <div class="card-ornament">🌸 ✨ 🌸</div>
+        <p class="card-label">WISHING YOU A PROSPEROUS DIWALI</p>
+        <div class="card-ornament">🪔 🎆 🪔</div>
+    </div>
+
+    <div class="card-actions">
+        <button class="gold-btn" onclick="downloadCard()">📥 Download</button>
+        <button class="gold-btn" onclick="window.print()">🖨️ Print</button>
+        <button class="outline-btn" onclick="shareCard()">📤 Share</button>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-logo">👑 ROYAL DIWALI 👑</div>
+    <p>May the light of Diwali shine forever in your life.</p>
+    <p class="copyright">© 2026 Royal Diwali Celebration. All Rights Reserved.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
