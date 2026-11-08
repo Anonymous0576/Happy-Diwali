@@ -114,6 +114,12 @@
             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
         }
 
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .switch-link {
             color: var(--gold);
             cursor: pointer;
@@ -184,7 +190,7 @@
             <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your credentials to access the celebration.</p>
             <input type="email" id="loginEmail" placeholder="User ID / Email">
             <input type="password" id="loginPassword" placeholder="Password / PIN">
-            <button onclick="handleLogin()">✨ Login ✨</button>
+            <button id="loginBtn" onclick="handleLogin()">✨ Login ✨</button>
             <br>
             <span class="switch-link" onclick="switchToRegister()">New user? Create Profile</span>
         </div>
@@ -198,7 +204,7 @@
             <input type="email" id="regEmail" placeholder="User ID / Email">
             <input type="password" id="regPassword" placeholder="Create Password">
             <input type="email" id="regRecovery" placeholder="Recovery Email">
-            <button onclick="handleRegister()">✨ Register Profile ✨</button>
+            <button id="regBtn" onclick="handleRegister()">✨ Register Profile ✨</button>
             <br>
             <span class="switch-link" onclick="switchToLogin()">Already have an account? Login</span>
         </div>
@@ -338,7 +344,10 @@
                 return;
             }
 
-            // Save user profile in Firestore collection 'users'
+            const btn = document.getElementById('regBtn');
+            btn.disabled = true;
+            btn.textContent = "Creating Profile...";
+
             db.collection("users").doc(email).set({
                 name: name,
                 age: age,
@@ -348,9 +357,13 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 alert("Profile created successfully! Please login now.");
+                btn.disabled = false;
+                btn.textContent = "✨ Register Profile ✨";
                 switchToLogin();
             }).catch(error => {
                 alert("Error creating profile: " + error.message);
+                btn.disabled = false;
+                btn.textContent = "✨ Register Profile ✨";
             });
         }
 
@@ -364,7 +377,13 @@
                 return;
             }
 
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
+
             db.collection("users").doc(email).get().then((doc) => {
+                btn.disabled = false;
+                btn.textContent = "✨ Login ✨";
                 if (doc.exists) {
                     let userData = doc.data();
                     if (userData.password === password) {
@@ -377,6 +396,8 @@
                     alert("User profile not found! Please register first.");
                 }
             }).catch(error => {
+                btn.disabled = false;
+                btn.textContent = "✨ Login ✨";
                 alert("Login error: " + error.message);
             });
         }
@@ -392,7 +413,7 @@
         function saveLogToCloud(name, email, activity) {
             db.collection("site_logs").add({
                 name: name,
-                ip: email, // storing email ID in place of IP for user identification
+                ip: email,
                 activity: activity,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(error => console.error("Cloud Error: ", error));
