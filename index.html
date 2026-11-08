@@ -3,140 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Logged Web App</title>
+    <title>Royal Diwali 2026 Celebration</title>
+    
+    <!-- Html2Canvas for downloading greeting cards -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase App & Firestore CDNs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
-            --primary: #4f46e5;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
+            --gold: #FFD700;
+            --purple: #2a0845;
+            --bg-dark: #0f051d;
+            --card-bg: rgba(30, 15, 45, 0.85);
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .container {
+        /* FIREWORKS CANVAS */
+        #sky {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        h2, h3 {
-            color: #818cf8;
-            margin-top: 0;
-        }
-
-        input, button {
+        .main-wrapper {
+            position: relative;
+            z-index: 10;
             width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: #fff;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-
-        button {
-            background: var(--primary);
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background: #4338ca;
+            max-width: 800px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
+        /* CARD UI STYLES */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            color: var(--gold);
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid var(--gold);
+            background: rgba(15, 5, 29, 0.9);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        button, .btn {
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            margin: 8px 4px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* GRID FOR DIWALI FEATURES */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .grid-btn {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 15px 10px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .grid-btn:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        /* GREETING CARD SECTION */
+        #greetingCard {
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 2px solid var(--gold);
+        }
+        #greetingCard.gold { background: linear-gradient(135deg, #4a3b00, #1f1800); }
+        #greetingCard.purple { background: linear-gradient(135deg, #38102d, #140512); }
+        #greetingCard.red { background: linear-gradient(135deg, #4a0d0d, #1a0303); }
+
+        .big-art { font-size: 2.5rem; margin: 10px 0; }
+
+        /* ADMIN PANEL TABLE */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
             font-size: 0.85rem;
         }
-
-        th, td {
-            border: 1px solid #334155;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #312e81;
-        }
-
-        .badge {
-            background: #059669;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-        }
+        th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+        th { background: var(--purple); color: var(--gold); }
     </style>
-
-    <!-- Firebase App & Firestore CDNs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-    <!-- User Login / Entry Section -->
-    <div class="container" id="loginCard">
-        <h2>👋 Welcome! Please Enter Your Details</h2>
-        <p>Aapka naam aur activity cloud database me securely record ki jayegi.</p>
-        <input type="text" id="userNameInput" placeholder="Apna Naam Likhein (e.g. Adarsh)">
-        <button onclick="registerUserLogin()">Enter Site</button>
-    </div>
+    <!-- Sky Fireworks Canvas -->
+    <canvas id="sky"></canvas>
 
-    <!-- Main Dashboard Section -->
-    <div class="container hidden" id="mainDashboard">
-        <h2>🚀 Dashboard</h2>
-        <p>Welcome, <span id="displayName" style="color: #38bdf8; font-weight: bold;"></span>!</p>
-        <button onclick="logUserActivity('Clicked Interactive Button')">⚡ Click to Test Activity</button>
-        <hr style="border-color: #334155; margin: 20px 0;">
-        
-        <button style="background: #0f172a; border: 1px solid #818cf8;" onclick="openAdminPanel()">🔐 Developer Admin Panel</button>
-    </div>
+    <div class="main-wrapper">
 
-    <!-- Admin Panel -->
-    <div class="container hidden" id="adminPanel">
-        <h3>🛡️ Cloud Analytics & User Logs</h3>
-        <p style="font-size: 0.85rem; color: #94a3b8;">Yeh data Firebase Firestore database se live fetch ho raha hai.</p>
-        <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Name</th>
-                        <th>IP / Device Info</th>
-                        <th>Activity</th>
-                    </tr>
-                </thead>
-                <tbody id="logTableBody"></tbody>
-            </table>
+        <!-- 1. LOGIN / ENTRY CARD -->
+        <div class="glass-card" id="loginCard">
+            <h2>🪔 Welcome to Royal Diwali 2026</h2>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Please enter your name to unlock the grand celebration.</p>
+            <input type="text" id="userNameInput" placeholder="Apna Naam Likhein (e.g. Adarsh)">
+            <button onclick="registerUserLogin()">✨ Enter Site ✨</button>
         </div>
-        <button style="background: #b91c1c; margin-top: 15px;" onclick="closeAdminPanel()">Close Panel</button>
+
+        <!-- 2. MAIN DIWALI WEBSITE CONTENT (Revealed after login) -->
+        <div class="glass-card hidden" id="mainDashboard">
+            <h2>✨ Happy Diwali, <span id="displayName" style="color: #FFD700;"></span>! ✨</h2>
+            <p id="liveClock" style="font-size: 0.9rem; color: #94a3b8;"></p>
+
+            <!-- Fireworks & Interaction Controls -->
+            <div style="margin: 15px 0;">
+                <button onclick="startCelebration()">🎆 Launch Skyshots</button>
+                <button onclick="wishFountain()">🌟 Golden Wish Fountain</button>
+                <button onclick="ringBell()">🔔 Celebration Bell</button>
+            </div>
+
+            <!-- Grid Menu for Features -->
+            <div class="grid-menu">
+                <button class="grid-btn" onclick="lightDiyas()">🪔 Divine Diyas</button>
+                <button class="grid-btn" onclick="showRangoli()">🎨 Royal Rangoli</button>
+                <button class="grid-btn" onclick="openGift()">🎁 Surprise Gift</button>
+                <button class="grid-btn" onclick="openCard()">💌 Create Card</button>
+                <button class="grid-btn" onclick="toggleParticles()">✨ Particles</button>
+            </div>
+
+            <!-- Dynamic Wish Generator -->
+            <div style="margin-top: 25px; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 10px;">
+                <h3>📜 Festive Wishes</h3>
+                <p id="wishText" style="font-size: 1.1rem; margin: 10px 0; min-height: 50px;">May your home shine with happiness and prosperity! 🪔</p>
+                <button onclick="newWish()">🎲 New Wish</button>
+                <button onclick="shareWish()">📤 Share Wish</button>
+            </div>
+
+            <!-- Display Area for Custom Sections -->
+            <div id="displaySection" class="glass-card" hidden style="margin-top: 20px;">
+                <h3 id="displayTitle"></h3>
+                <div id="displayContent"></div>
+            </div>
+
+            <!-- Custom Card Creator Area -->
+            <div id="cardArea" hidden style="margin-top: 20px;">
+                <div id="greetingCard" class="gold">
+                    <h2 style="color: gold;">🪔 Happy Diwali 🪔</h2>
+                    <p style="font-size: 1.2rem; margin: 10px 0;">Warm wishes from</p>
+                    <h1 id="generatedName" style="color: #fff; font-size: 2rem;"></h1>
+                    <p style="margin-top: 10px;">May your life be filled with joy, success, and prosperity!</p>
+                </div>
+                <button onclick="downloadCard()">📥 Download Card</button>
+                <button onclick="shareCard()">📤 Share Card</button>
+            </div>
+
+            <!-- Admin Access Footer -->
+            <div style="margin-top: 30px;">
+                <button style="background: transparent; border: 1px solid #64748b; color: #94a3b8; font-size: 0.8rem;" onclick="openAdminPanel()">🔐 Admin Logs</button>
+            </div>
+        </div>
+
+        <!-- 3. ADMIN PANEL MODAL -->
+        <div class="glass-card hidden" id="adminPanel">
+            <h3>🛡️ Cloud Visitor Logs</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Name</th>
+                            <th>IP Info</th>
+                            <th>Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody"></tbody>
+                </table>
+            </div>
+            <button style="background: #b91c1c; color: #fff; margin-top: 15px;" onclick="closeAdminPanel()">Close Panel</button>
+        </div>
+
+    </div>
+
+    <!-- CARD CREATOR MODAL -->
+    <div id="cardModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
+        <div class="glass-card" style="max-width: 400px;">
+            <h3>💌 Create Personalized Card</h3>
+            <input type="text" id="cardInput" placeholder="Enter sender name">
+            <select id="cardStyle">
+                <option value="gold">Royal Gold</option>
+                <option value="purple">Imperial Purple</option>
+                <option value="red">Festive Red</option>
+            </select>
+            <button onclick="createCard()">Generate</button>
+            <button onclick="closeCard()" style="background:#555; color:#fff;">Cancel</button>
+        </div>
     </div>
 
     <script>
-        // --- YOUR FIREBASE CONFIGURATION ---
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyAyBR9YbGKCSa4BBIxm_Ep3GhhhMsIk3rY",
             authDomain: "diwali-database.firebaseapp.com",
@@ -147,12 +278,11 @@
             measurementId: "G-7HM5JVWKHP"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const ADMIN_PIN = "8920";
 
-        const ADMIN_PIN = "8920"; // Aapka Secret Developer PIN
-
+        // --- LOGIN & CLOUD LOGGING ---
         function registerUserLogin() {
             const name = document.getElementById('userNameInput').value.trim();
             if (!name) {
@@ -163,11 +293,11 @@
             fetch('https://api.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
-                    saveLogToCloud(name, data.ip, "Logged into the site");
+                    saveLogToCloud(name, data.ip, "Entered Diwali Site");
                     completeLogin(name);
                 })
                 .catch(() => {
-                    saveLogToCloud(name, "IP Hidden / Local", "Logged into the site");
+                    saveLogToCloud(name, "IP Hidden", "Entered Diwali Site");
                     completeLogin(name);
                 });
         }
@@ -177,74 +307,211 @@
             document.getElementById('displayName').innerText = name;
             document.getElementById('loginCard').classList.add('hidden');
             document.getElementById('mainDashboard').classList.remove('hidden');
+            startCelebration(); // Launch fireworks automatically upon entry!
         }
 
-        function logUserActivity(activityText) {
-            const name = localStorage.getItem('current_user') || "Unknown User";
-            fetch('https://api.ipify.org?format=json')
-                .then(res => res.json())
-                .then(data => saveLogToCloud(name, data.ip, activityText))
-                .catch(() => saveLogToCloud(name, "Localhost", activityText));
-            
-            alert("Activity recorded to Cloud: " + activityText);
-        }
-
-        // --- SAVE TO FIRESTORE DATABASE ---
         function saveLogToCloud(name, ip, activity) {
             db.collection("site_logs").add({
                 name: name,
                 ip: ip,
                 activity: activity,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(error => {
-                console.error("Error adding document: ", error);
-            });
+            }).catch(error => console.error("Cloud Error: ", error));
         }
 
-        // --- ADMIN PANEL & FETCHING FROM CLOUD ---
+        // --- ADMIN PANEL LOGIC ---
         function openAdminPanel() {
             let pin = prompt("Enter Developer Secret PIN:");
             if (pin === ADMIN_PIN) {
                 document.getElementById('adminPanel').classList.remove('hidden');
                 loadCloudLogsTable();
             } else {
-                alert("Incorrect PIN! Access Denied.");
+                alert("Incorrect PIN!");
             }
         }
-
-        function closeAdminPanel() {
-            document.getElementById('adminPanel').classList.add('hidden');
-        }
+        function closeAdminPanel() { document.getElementById('adminPanel').classList.add('hidden'); }
 
         function loadCloudLogsTable() {
             let tbody = document.getElementById('logTableBody');
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Loading from Cloud...</td></tr>`;
-
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>`;
             db.collection("site_logs").orderBy("timestamp", "desc").get()
                 .then((querySnapshot) => {
                     tbody.innerHTML = '';
-                    if (querySnapshot.empty) {
-                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No logs found in database.</td></tr>`;
-                        return;
-                    }
                     querySnapshot.forEach((doc) => {
                         let log = doc.data();
                         let timeStr = log.timestamp ? log.timestamp.toDate().toLocaleString('en-IN') : 'Just now';
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${timeStr}</td>
-                                <td><b>${log.name}</b></td>
-                                <td><span class="badge">${log.ip}</span></td>
-                                <td>${log.activity}</td>
-                            </tr>
-                        `;
+                        tbody.innerHTML += `<tr><td>${timeStr}</td><td><b>${log.name}</b></td><td>${log.ip}</td><td>${log.activity}</td></tr>`;
                     });
-                })
-                .catch((error) => {
-                    console.error("Error getting documents: ", error);
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#ef4444;">Error loading logs. Check Firestore Rules.</td></tr>`;
                 });
         }
+
+        // --- LIVE CLOCK ---
+        function updateClock() {
+            document.getElementById("liveClock").textContent = new Date().toLocaleString("en-IN", {
+                weekday: "long", hour: "2-digit", minute: "2-digit", second: "2-digit"
+            });
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // --- FIREWORK SKY ENGINE ---
+        const canvas = document.getElementById("sky");
+        const ctx = canvas.getContext("2d");
+        let rockets = [], sparks = [], celebrationTimer = null;
+        const colours = ["#FFD700", "#FF3D68", "#00E5FF", "#B66CFF", "#FFFFFF", "#FF8C00", "#6EFFA5", "#FF4DE1"];
+
+        function resizeSky() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resizeSky();
+        window.addEventListener("resize", resizeSky);
+
+        function launchRocket(x, targetY, style = "normal") {
+            const color = colours[Math.floor(Math.random() * colours.length)];
+            rockets.push({ x: x, y: window.innerHeight + 10, targetY: targetY, vx: (Math.random() - 0.5) * 1.5, vy: -(Math.random() * 3 + 7), color: color, style: style, trail: [] });
+        }
+
+        function explode(x, y, color, style = "normal") {
+            let count = style === "mega" ? 180 : (style === "ring" ? 120 : 90);
+            for (let i = 0; i < count; i++) {
+                let angle = (Math.PI * 2 * i) / count;
+                let speed = Math.random() * 6 + 1;
+                sparks.push({ x: x, y: y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, color: color, life: 60 + Math.random() * 30, maxLife: 90, size: Math.random() * 3 + 1 });
+            }
+        }
+
+        function animateSky() {
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            for (let i = rockets.length - 1; i >= 0; i--) {
+                const r = rockets[i];
+                r.x += r.vx; r.y += r.vy; r.vy += 0.045;
+                ctx.fillStyle = r.color;
+                ctx.beginPath(); ctx.arc(r.x, r.y, 3, 0, Math.PI * 2); ctx.fill();
+                if (r.y <= r.targetY || r.vy >= -0.5) { explode(r.x, r.y, r.color, r.style); rockets.splice(i, 1); }
+            }
+            for (let i = sparks.length - 1; i >= 0; i--) {
+                const p = sparks[i];
+                p.x += p.vx; p.y += p.vy; p.vx *= 0.98; p.vy *= 0.98; p.vy += 0.045; p.life--;
+                ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+                ctx.fillStyle = p.color;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                if (p.life <= 0) sparks.splice(i, 1);
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(animateSky);
+        }
+        animateSky();
+
+        function randomSkyshot() {
+            launchRocket(Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1, Math.random() * window.innerHeight * 0.4 + 60, "mega");
+        }
+        function startCelebration() {
+            stopCelebration();
+            let count = 0;
+            randomSkyshot();
+            celebrationTimer = setInterval(() => {
+                randomSkyshot();
+                count++;
+                if (count >= 15) stopCelebration();
+            }, 600);
+        }
+        function stopCelebration() { if (celebrationTimer) { clearInterval(celebrationTimer); celebrationTimer = null; } }
+
+        // --- DIWALI FEATURES ---
+        function lightDiyas() {
+            showDisplay("🪔 Divine Lighting Ceremony", `<div class="big-art">🪔 ✨ 🪔 ✨ 🪔</div><p>Let every diya bring hope and prosperity into your life.</p>`);
+            for (let i = 0; i < 4; i++) setTimeout(randomSkyshot, i * 300);
+        }
+        function showRangoli() {
+            showDisplay("🎨 Royal Rangoli", `<div class="big-art">🌺 🌸 🪷 🌸 🌺</div><p>Colours of tradition, beauty, and happiness!</p>`);
+        }
+        function openGift() {
+            showDisplay("🎁 Royal Surprise", `<div class="big-art">🎁</div><h2 style="color:gold">You Are Special!</h2><p>May your dreams turn into reality!</p>`);
+            setTimeout(randomSkyshot, 300);
+        }
+
+        const wishes = [
+            "May your home shine with happiness and prosperity! 🪔",
+            "May every diya bring new hope and endless joy! ✨",
+            "Wishing you success, peace, and beautiful memories! 💛",
+            "May Goddess Lakshmi bless your home with abundance! 🌸"
+        ];
+        function newWish() { document.getElementById("wishText").textContent = wishes[Math.floor(Math.random() * wishes.length)]; }
+        async function shareWish() {
+            const wish = document.getElementById("wishText").textContent;
+            if (navigator.share) { navigator.share({ title: "Happy Diwali", text: wish }); }
+            else { navigator.clipboard.writeText(wish); alert("Wish copied to clipboard!"); }
+        }
+
+        // --- PARTICLES ---
+        let particlesEnabled = true;
+        function createParticle() {
+            if (!particlesEnabled) return;
+            const p = document.createElement("div");
+            p.textContent = "✦"; p.style.position = "fixed"; p.style.left = Math.random() * 100 + "%"; p.style.bottom = "-20px";
+            p.style.fontSize = (Math.random() * 18 + 10) + "px"; p.style.color = "#FFD700"; p.style.pointerEvents = "none"; p.style.zIndex = "5";
+            p.style.animation = "floatParticle 6s linear forwards";
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 6000);
+        }
+        const particleStyle = document.createElement("style");
+        particleStyle.textContent = `@keyframes floatParticle { to { transform: translateY(-110vh) rotate(360deg); opacity: 0; } }`;
+        document.head.appendChild(particleStyle);
+        setInterval(createParticle, 500);
+        function toggleParticles() { particlesEnabled = !particlesEnabled; }
+
+        function wishFountain() {
+            for (let i = 0; i < 6; i++) setTimeout(() => launchRocket(window.innerWidth / 2 + (Math.random() - 0.5) * 200, window.innerHeight * 0.2, "mega"), i * 150);
+        }
+
+        // --- AUDIO BELL ---
+        function ringBell() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.type = "sine"; osc.frequency.value = 880;
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.5);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 1.5);
+            } catch (e) {}
+            showDisplay("🔔 Celebration Bell", `<div class="big-art">🔔 ✨ 🔔</div><p>May peace and happiness fill your home.</p>`);
+        }
+
+        function showDisplay(title, content) {
+            const sec = document.getElementById("displaySection");
+            document.getElementById("displayTitle").textContent = title;
+            document.getElementById("displayContent").innerHTML = content;
+            sec.hidden = false;
+            sec.scrollIntoView({ behavior: "smooth" });
+        }
+
+        // --- GREETING CARD BUILDER ---
+        function openCard() { document.getElementById("cardModal").style.display = "flex"; }
+        function closeCard() { document.getElementById("cardModal").style.display = "none"; }
+        function createCard() {
+            const name = document.getElementById("cardInput").value.trim();
+            if (!name) return alert("Please enter name!");
+            document.getElementById("generatedName").textContent = name;
+            const card = document.getElementById("greetingCard");
+            card.className = document.getElementById("cardStyle").value;
+            closeCard();
+            document.getElementById("cardArea").hidden = false;
+            document.getElementById("cardArea").scrollIntoView({ behavior: "smooth" });
+        }
+
+        async function downloadCard() {
+            if (typeof html2canvas === "undefined") return alert("Library missing!");
+            const canvas = await html2canvas(document.getElementById("greetingCard"), { scale: 2 });
+            const link = document.createElement("a");
+            link.download = "Royal-Diwali-2026.png"; link.href = canvas.toDataURL(); link.click();
+        }
+        async function shareCard() { downloadCard(); }
     </script>
 </body>
 </html>
