@@ -1,229 +1,250 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Royal Diwali 2026 👑</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Logged Web App</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        h2, h3 {
+            color: #818cf8;
+            margin-top: 0;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--primary);
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #4338ca;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            border: 1px solid #334155;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #312e81;
+        }
+
+        .badge {
+            background: #059669;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+    </style>
+
+    <!-- Firebase App & Firestore CDNs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
 <body>
 
-<canvas id="sky"></canvas>
-
-<audio id="music" src="music.mp3" loop></audio>
-
-<!-- NAVBAR -->
-<nav class="navbar">
-    <div class="brand">👑 ROYAL DIWALI</div>
-
-    <div class="nav-actions">
-        <button onclick="toggleMusic()" id="musicButton">🎵 Music</button>
-        <button onclick="toggleTheme()" id="themeButton">🌙 Theme</button>
-        <button onclick="openCard()">🎴 Create Card</button>
-    </div>
-</nav>
-
-<!-- HERO -->
-<header class="hero">
-
-    <div class="royal-tag">✦ THE GRAND FESTIVAL OF LIGHTS ✦</div>
-
-    <h1>Happy <span>Diwali</span></h1>
-
-    <p class="hero-description">
-        A night of lights, a sky full of dreams,
-        and a heart full of happiness.
-    </p>
-
-    <div class="hero-diyas">🪔 ✨ 🪔 ✨ 🪔</div>
-
-    <div id="liveClock"></div>
-
-    <div class="hero-buttons">
-        <button class="gold-btn" onclick="startCelebration()">
-            🎆 CELEBRATE DIWALI
-        </button>
-
-        <button class="outline-btn" onclick="openCard()">
-            🎴 CREATE YOUR CARD
-        </button>
+    <!-- User Login / Entry Section -->
+    <div class="container" id="loginCard">
+        <h2>👋 Welcome! Please Enter Your Details</h2>
+        <p>Aapka naam aur activity cloud database me securely record ki jayegi.</p>
+        <input type="text" id="userNameInput" placeholder="Apna Naam Likhein (e.g. Adarsh)">
+        <button onclick="registerUserLogin()">Enter Site</button>
     </div>
 
-    <p class="hint">Scroll down to explore the royal celebration ↓</p>
-</header>
-
-<!-- MUSIC PANEL -->
-<section class="music-panel">
-    <div>
-        <h2>🎵 Royal Music Lounge</h2>
-        <p>Enjoy the festive atmosphere.</p>
+    <!-- Main Dashboard Section -->
+    <div class="container hidden" id="mainDashboard">
+        <h2>🚀 Dashboard</h2>
+        <p>Welcome, <span id="displayName" style="color: #38bdf8; font-weight: bold;"></span>!</p>
+        <button onclick="logUserActivity('Clicked Interactive Button')">⚡ Click to Test Activity</button>
+        <hr style="border-color: #334155; margin: 20px 0;">
+        
+        <button style="background: #0f172a; border: 1px solid #818cf8;" onclick="openAdminPanel()">🔐 Developer Admin Panel</button>
     </div>
 
-    <div class="music-controls">
-        <button class="gold-btn" onclick="toggleMusic()">▶ / ⏸</button>
-        <label for="volume">Volume</label>
-        <input type="range" id="volume" min="0" max="1"
-               step="0.05" value="0.5">
-    </div>
-</section>
-
-<!-- MAIN FEATURES -->
-<section class="section">
-    <div class="section-heading">✦ EXPLORE THE MAGIC ✦</div>
-    <h2>Royal Celebrations</h2>
-    <p class="muted">Choose an experience and make this Diwali unforgettable.</p>
-
-    <div class="feature-grid">
-
-        <article class="feature">
-            <div class="feature-icon">🎆</div>
-            <h3>Skyshot Show</h3>
-            <p>Launch colourful fireworks across the night sky.</p>
-            <button onclick="startCelebration()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">🪔</div>
-            <h3>Divine Diyas</h3>
-            <p>Light the lamps and fill the night with warmth.</p>
-            <button onclick="lightDiyas()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">🎨</div>
-            <h3>Royal Rangoli</h3>
-            <p>Discover colourful traditional decorations.</p>
-            <button onclick="showRangoli()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">🎁</div>
-            <h3>Surprise Gift</h3>
-            <p>Open a special festive surprise.</p>
-            <button onclick="openGift()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">💌</div>
-            <h3>Diwali Wishes</h3>
-            <p>Generate beautiful greetings for everyone.</p>
-            <button onclick="newWish()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">🎴</div>
-            <h3>Greeting Card</h3>
-            <p>Create and download your own royal card.</p>
-            <button onclick="openCard()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">✨</div>
-            <h3>Golden Particles</h3>
-            <p>Enjoy a magical shower of golden sparkles.</p>
-            <button onclick="toggleParticles()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">🌟</div>
-            <h3>Wish Fountain</h3>
-            <p>Release a fountain of glowing stars.</p>
-            <button onclick="wishFountain()">Explore →</button>
-        </article>
-
-        <article class="feature">
-            <div class="feature-icon">🔔</div>
-            <h3>Celebration Bell</h3>
-            <p>Play a festive bell sound.</p>
-            <button onclick="ringBell()">Explore →</button>
-        </article>
-
-    </div>
-</section>
-
-<!-- DIWALI MESSAGE -->
-<section class="section">
-    <div class="section-heading">✦ FESTIVE BLESSINGS ✦</div>
-    <h2>Words of Happiness</h2>
-
-    <div class="wish-card">
-        <div class="feature-icon">🌸</div>
-        <p id="wishText">
-            May this Diwali bring endless happiness,
-            prosperity and success into your life.
-        </p>
-        <button class="gold-btn" onclick="newWish()">Generate New Wish</button>
-        <button class="outline-btn" onclick="shareWish()">Share Wish</button>
-    </div>
-</section>
-
-<!-- SPECIAL DISPLAY -->
-<section class="section display-section" id="displaySection" hidden>
-    <div class="section-heading">✦ SPECIAL EXPERIENCE ✦</div>
-    <h2 id="displayTitle"></h2>
-    <div id="displayContent"></div>
-</section>
-
-<!-- CARD MODAL -->
-<div class="modal" id="cardModal">
-    <div class="modal-box">
-        <button class="modal-close" onclick="closeCard()">✕</button>
-
-        <div class="feature-icon">🎴</div>
-        <h2>Create Your Royal Card</h2>
-        <p>Make a personalized Diwali greeting card.</p>
-
-        <input id="cardInput" maxlength="40"
-               placeholder="Enter your name">
-
-        <label for="cardStyle">Choose card design</label>
-
-        <select id="cardStyle">
-            <option value="gold">Royal Golden</option>
-            <option value="purple">Royal Purple</option>
-            <option value="red">Traditional Red</option>
-        </select>
-
-        <button class="gold-btn" onclick="createCard()">
-            Create My Card ✨
-        </button>
-    </div>
-</div>
-
-<!-- GENERATED CARD -->
-<section id="cardArea" hidden>
-    <div id="greetingCard">
-        <div class="card-ornament">👑 ✦ 🪔 ✦ 👑</div>
-        <p class="card-label">A SPECIAL GREETING FOR</p>
-        <h2>HAPPY DIWALI</h2>
-        <h3 id="generatedName"></h3>
-        <p>
-            May your home shine with happiness,
-            your heart glow with peace, and
-            your life sparkle with success.
-        </p>
-        <div class="card-ornament">🌸 ✨ 🌸</div>
-        <p class="card-label">WISHING YOU A PROSPEROUS DIWALI</p>
-        <div class="card-ornament">🪔 🎆 🪔</div>
+    <!-- Admin Panel -->
+    <div class="container hidden" id="adminPanel">
+        <h3>🛡️ Cloud Analytics & User Logs</h3>
+        <p style="font-size: 0.85rem; color: #94a3b8;">Yeh data Firebase Firestore database se live fetch ho raha hai.</p>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Name</th>
+                        <th>IP / Device Info</th>
+                        <th>Activity</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody"></tbody>
+            </table>
+        </div>
+        <button style="background: #b91c1c; margin-top: 15px;" onclick="closeAdminPanel()">Close Panel</button>
     </div>
 
-    <div class="card-actions">
-        <button class="gold-btn" onclick="downloadCard()">📥 Download</button>
-        <button class="gold-btn" onclick="window.print()">🖨️ Print</button>
-        <button class="outline-btn" onclick="shareCard()">📤 Share</button>
-    </div>
-</section>
+    <script>
+        // --- YOUR FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyBR9YbGKCSa4BBIxm_Ep3GhhhMsIk3rY",
+            authDomain: "diwali-database.firebaseapp.com",
+            projectId: "diwali-database",
+            storageBucket: "diwali-database.firebasestorage.app",
+            messagingSenderId: "1091780343201",
+            appId: "1:1091780343201:web:ec2a7e39be2911cd9447e0",
+            measurementId: "G-7HM5JVWKHP"
+        };
 
-<!-- FOOTER -->
-<footer>
-    <div class="footer-logo">👑 ROYAL DIWALI 👑</div>
-    <p>May the light of Diwali shine forever in your life.</p>
-    <p class="copyright">© 2026 Royal Diwali Celebration. All Rights Reserved.</p>
-</footer>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-<script src="script.js"></script>
+        const ADMIN_PIN = "8920"; // Aapka Secret Developer PIN
+
+        function registerUserLogin() {
+            const name = document.getElementById('userNameInput').value.trim();
+            if (!name) {
+                alert("Please enter your name first!");
+                return;
+            }
+
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    saveLogToCloud(name, data.ip, "Logged into the site");
+                    completeLogin(name);
+                })
+                .catch(() => {
+                    saveLogToCloud(name, "IP Hidden / Local", "Logged into the site");
+                    completeLogin(name);
+                });
+        }
+
+        function completeLogin(name) {
+            localStorage.setItem('current_user', name);
+            document.getElementById('displayName').innerText = name;
+            document.getElementById('loginCard').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+        }
+
+        function logUserActivity(activityText) {
+            const name = localStorage.getItem('current_user'] || "Unknown User";
+            fetch('https://api.ipify.org?format=json')
+                .then(res => res.json())
+                .then(data => saveLogToCloud(name, data.ip, activityText))
+                .catch(() => saveLogToCloud(name, "Localhost", activityText));
+            
+            alert("Activity recorded to Cloud: " + activityText);
+        }
+
+        // --- SAVE TO FIRESTORE DATABASE ---
+        function saveLogToCloud(name, ip, activity) {
+            db.collection("site_logs").add({
+                name: name,
+                ip: ip,
+                activity: activity,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(error => {
+                console.error("Error adding document: ", error);
+            });
+        }
+
+        // --- ADMIN PANEL & FETCHING FROM CLOUD ---
+        function openAdminPanel() {
+            let pin = prompt("Enter Developer Secret PIN:");
+            if (pin === ADMIN_PIN) {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadCloudLogsTable();
+            } else {
+                alert("Incorrect PIN! Access Denied.");
+            }
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').classList.add('hidden');
+        }
+
+        function loadCloudLogsTable() {
+            let tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Loading from Cloud...</td></tr>`;
+
+            db.collection("site_logs").orderBy("timestamp", "desc").get()
+                .then((querySnapshot) => {
+                    tbody.innerHTML = '';
+                    if (querySnapshot.empty) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No logs found in database.</td></tr>`;
+                        return;
+                    }
+                    querySnapshot.forEach((doc) => {
+                        let log = doc.data();
+                        let timeStr = log.timestamp ? log.timestamp.toDate().toLocaleString('en-IN') : 'Just now';
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${timeStr}</td>
+                                <td><b>${log.name}</b></td>
+                                <td><span class="badge">${log.ip}</span></td>
+                                <td>${log.activity}</td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error getting documents: ", error);
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#ef4444;">Error loading logs. Check Firestore Rules.</td></tr>`;
+                });
+        }
+    </script>
 </body>
 </html>
