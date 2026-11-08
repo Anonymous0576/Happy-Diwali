@@ -180,7 +180,7 @@
         }
 
         function logUserActivity(activityText) {
-            const name = localStorage.getItem('current_user'] || "Unknown User";
+            const name = localStorage.getItem('current_user') || "Unknown User";
             fetch('https://api.ipify.org?format=json')
                 .then(res => res.json())
                 .then(data => saveLogToCloud(name, data.ip, activityText))
