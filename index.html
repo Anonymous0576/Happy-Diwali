@@ -192,10 +192,11 @@
             <input type="password" id="loginPassword" placeholder="Password / PIN">
             <button id="loginBtn" onclick="handleLogin()">✨ Login ✨</button>
             <br>
-            <span class="switch-link" onclick="switchToRegister()">New user? Create Profile</span>
+            <span class="switch-link" onclick="switchToRegister()">New user? Create Profile</span><br>
+            <span class="switch-link" onclick="switchToForgot()" style="color: #cbd5e1; font-size: 0.85rem;">Forgot Password?</span>
         </div>
 
-        <!-- 1B. REGISTRATION CARD (With Age Check < 18 Block) -->
+        <!-- 1B. REGISTRATION CARD -->
         <div class="glass-card hidden" id="registerCard">
             <h2>📝 Create User Profile</h2>
             <p style="color: #cbd5e1; margin-bottom: 15px;">Must be 18 or older to register.</p>
@@ -209,33 +210,45 @@
             <span class="switch-link" onclick="switchToLogin()">Already have an account? Login</span>
         </div>
 
-        <!-- 2. MAIN DIWALI WEBSITE CONTENT (Revealed after login) -->
+        <!-- 1C. FORGOT PASSWORD CARD -->
+        <div class="glass-card hidden" id="forgotCard">
+            <h2>🔑 Recover Password</h2>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your registered Email and Recovery Email.</p>
+            <input type="email" id="forgotEmail" placeholder="Registered User ID / Email">
+            <input type="email" id="forgotRecovery" placeholder="Recovery Email">
+            <input type="password" id="newPassword" placeholder="Enter New Password">
+            <button id="forgotBtn" onclick="handlePasswordReset()">🔄 Reset Password</button>
+            <br>
+            <span class="switch-link" onclick="switchToLogin()">Back to Login</span>
+        </div>
+
+        <!-- 2. MAIN DIWALI WEBSITE CONTENT -->
         <div class="glass-card hidden" id="mainDashboard">
             <h2>✨ Happy Diwali, <span id="displayName" style="color: #FFD700;"></span>! ✨</h2>
             <p id="liveClock" style="font-size: 0.9rem; color: #94a3b8;"></p>
 
             <!-- Fireworks & Interaction Controls -->
             <div style="margin: 15px 0;">
-                <button onclick="startCelebration()">🎆 Launch Skyshots</button>
-                <button onclick="wishFountain()">🌟 Golden Wish Fountain</button>
-                <button onclick="ringBell()">🔔 Celebration Bell</button>
+                <button onclick="startCelebration(); trackActivity('Launched Skyshots');">🎆 Launch Skyshots</button>
+                <button onclick="wishFountain(); trackActivity('Triggered Wish Fountain');">🌟 Golden Wish Fountain</button>
+                <button onclick="ringBell(); trackActivity('Rang Celebration Bell');">🔔 Celebration Bell</button>
             </div>
 
             <!-- Grid Menu for Features -->
             <div class="grid-menu">
-                <button class="grid-btn" onclick="lightDiyas()">🪔 Divine Diyas</button>
-                <button class="grid-btn" onclick="showRangoli()">🎨 Royal Rangoli</button>
-                <button class="grid-btn" onclick="openGift()">🎁 Surprise Gift</button>
-                <button class="grid-btn" onclick="openCard()">💌 Create Card</button>
-                <button class="grid-btn" onclick="toggleParticles()">✨ Particles</button>
+                <button class="grid-btn" onclick="lightDiyas(); trackActivity('Lit Divine Diyas');">🪔 Divine Diyas</button>
+                <button class="grid-btn" onclick="showRangoli(); trackActivity('Viewed Royal Rangoli');">🎨 Royal Rangoli</button>
+                <button class="grid-btn" onclick="openGift(); trackActivity('Opened Surprise Gift');">🎁 Surprise Gift</button>
+                <button class="grid-btn" onclick="openCard(); trackActivity('Opened Card Creator');">💌 Create Card</button>
+                <button class="grid-btn" onclick="toggleParticles(); trackActivity('Toggled Particles');">✨ Particles</button>
             </div>
 
             <!-- Dynamic Wish Generator -->
             <div style="margin-top: 25px; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 10px;">
                 <h3>📜 Festive Wishes</h3>
                 <p id="wishText" style="font-size: 1.1rem; margin: 10px 0; min-height: 50px;">May your home shine with happiness and prosperity! 🪔</p>
-                <button onclick="newWish()">🎲 New Wish</button>
-                <button onclick="shareWish()">📤 Share Wish</button>
+                <button onclick="newWish(); trackActivity('Generated New Wish');">🎲 New Wish</button>
+                <button onclick="shareWish(); trackActivity('Shared Festive Wish');">📤 Share Wish</button>
             </div>
 
             <!-- Display Area for Custom Sections -->
@@ -252,8 +265,8 @@
                     <h1 id="generatedName" style="color: #fff; font-size: 2rem;"></h1>
                     <p style="margin-top: 10px;">May your life be filled with joy, success, and prosperity!</p>
                 </div>
-                <button onclick="downloadCard()">📥 Download Card</button>
-                <button onclick="shareCard()">📤 Share Card</button>
+                <button onclick="downloadCard(); trackActivity('Downloaded Greeting Card');">📥 Download Card</button>
+                <button onclick="shareCard(); trackActivity('Shared Greeting Card');">📤 Share Card</button>
             </div>
 
             <!-- Admin Access Footer -->
@@ -264,16 +277,16 @@
 
         <!-- 3. ADMIN PANEL MODAL -->
         <div class="glass-card hidden" id="adminPanel">
-            <h3>🛡️ Cloud Visitor & User Logs</h3>
-            <h4 style="color: #FFD700; margin: 10px 0;">Total Records / Logs: <span id="totalCount">0</span></h4>
+            <h3>🛡️ Cloud Visitor & Activity Logs</h3>
+            <h4 style="color: #FFD700; margin: 10px 0;">Total Logs: <span id="totalCount">0</span></h4>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
                         <tr>
                             <th>Time</th>
                             <th>Name</th>
-                            <th>ID / Email</th>
-                            <th>Activity</th>
+                            <th>IP Address</th>
+                            <th>Activity Details</th>
                         </tr>
                     </thead>
                     <tbody id="logTableBody"></tbody>
@@ -294,7 +307,7 @@
                 <option value="purple">Imperial Purple</option>
                 <option value="red">Festive Red</option>
             </select>
-            <button onclick="createCard()">Generate</button>
+            <button onclick="createCard(); trackActivity('Created Custom Card');">Generate</button>
             <button onclick="closeCard()" style="background:#555; color:#fff;">Cancel</button>
         </div>
     </div>
@@ -315,14 +328,32 @@
         const db = firebase.firestore();
         const ADMIN_PIN = "8920";
 
+        let currentActiveUser = { name: '', email: '', ip: 'Fetching...' };
+
+        // --- FETCH PUBLIC IP ADDRESS ---
+        function fetchUserIP() {
+            fetch('https://api.ipify.org?format=json')
+                .then(res => res.json())
+                .then(data => { currentActiveUser.ip = data.ip; })
+                .catch(() => { currentActiveUser.ip = 'IP Hidden'; });
+        }
+        fetchUserIP();
+
         // --- SWITCH UI PANELS ---
         function switchToRegister() {
             document.getElementById('loginCard').classList.add('hidden');
+            document.getElementById('forgotCard').classList.add('hidden');
             document.getElementById('registerCard').classList.remove('hidden');
         }
         function switchToLogin() {
             document.getElementById('registerCard').classList.add('hidden');
+            document.getElementById('forgotCard').classList.add('hidden');
             document.getElementById('loginCard').classList.remove('hidden');
+        }
+        function switchToForgot() {
+            document.getElementById('loginCard').classList.add('hidden');
+            document.getElementById('registerCard').classList.add('hidden');
+            document.getElementById('forgotCard').classList.remove('hidden');
         }
 
         // --- REGISTRATION LOGIC WITH AGE CHECK ---
@@ -331,14 +362,13 @@
             const age = parseInt(document.getElementById('regAge').value);
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value.trim();
-            const recovery = document.getElementById('regRecovery').value.trim();
+            const recovery = document.getElementById('regRecovery').value.trim().toLowerCase();
 
             if (!name || !age || !email || !password || !recovery) {
                 alert("Please fill all fields!");
                 return;
             }
 
-            // Age Restriction Rule (< 18 block)
             if (age < 18) {
                 alert("Access Denied: You must be 18 years or older to create an account and access this site.");
                 return;
@@ -367,6 +397,50 @@
             });
         }
 
+        // --- FORGOT PASSWORD RESET LOGIC ---
+        function handlePasswordReset() {
+            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+            const recovery = document.getElementById('forgotRecovery').value.trim().toLowerCase();
+            const newPassword = document.getElementById('newPassword').value.trim();
+
+            if (!email || !recovery || !newPassword) {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            const btn = document.getElementById('forgotBtn');
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
+
+            db.collection("users").doc(email).get().then((doc) => {
+                if (doc.exists) {
+                    let userData = doc.data();
+                    if (userData.recovery === recovery) {
+                        db.collection("users").doc(email).update({
+                            password: newPassword
+                        }).then(() => {
+                            alert("Password successfully reset! Please login with your new password.");
+                            btn.disabled = false;
+                            btn.textContent = "🔄 Reset Password";
+                            switchToLogin();
+                        });
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = "🔄 Reset Password";
+                        alert("Recovery email does not match our records!");
+                    }
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = "🔄 Reset Password";
+                    alert("User ID / Email not found!");
+                }
+            }).catch(error => {
+                btn.disabled = false;
+                btn.textContent = "🔄 Reset Password";
+                alert("Error: " + error.message);
+            });
+        }
+
         // --- LOGIN LOGIC ---
         function handleLogin() {
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -387,7 +461,9 @@
                 if (doc.exists) {
                     let userData = doc.data();
                     if (userData.password === password) {
-                        saveLogToCloud(userData.name, email, "LoggedIn to Site");
+                        currentActiveUser.name = userData.name;
+                        currentActiveUser.email = email;
+                        saveLogToCloud("LoggedIn to Site");
                         completeLogin(userData.name);
                     } else {
                         alert("Incorrect Password!");
@@ -406,17 +482,25 @@
             document.getElementById('displayName').innerText = name;
             document.getElementById('loginCard').classList.add('hidden');
             document.getElementById('registerCard').classList.add('hidden');
+            document.getElementById('forgotCard').classList.add('hidden');
             document.getElementById('mainDashboard').classList.remove('hidden');
             startCelebration();
         }
 
-        function saveLogToCloud(name, email, activity) {
+        // --- CLOUD LOGGING FUNCTION (IP + ACTIVITY) ---
+        function saveLogToCloud(activity) {
+            if (!currentActiveUser.name) return;
             db.collection("site_logs").add({
-                name: name,
-                ip: email,
+                name: currentActiveUser.name,
+                email: currentActiveUser.email,
+                ip: currentActiveUser.ip,
                 activity: activity,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(error => console.error("Cloud Error: ", error));
+        }
+
+        function trackActivity(activityName) {
+            saveLogToCloud(activityName);
         }
 
         // --- ADMIN PANEL LOGIC ---
@@ -443,7 +527,12 @@
                     querySnapshot.forEach((doc) => {
                         let log = doc.data();
                         let timeStr = log.timestamp ? log.timestamp.toDate().toLocaleString('en-IN') : 'Just now';
-                        tbody.innerHTML += `<tr><td>${timeStr}</td><td><b>${log.name}</b></td><td>${log.ip}</td><td>${log.activity}</td></tr>`;
+                        tbody.innerHTML += `<tr>
+                            <td>${timeStr}</td>
+                            <td><b>${log.name}</b> (${log.email || 'N/A'})</td>
+                            <td><code>${log.ip || 'N/A'}</code></td>
+                            <td>${log.activity}</td>
+                        </tr>`;
                     });
                 });
         }
