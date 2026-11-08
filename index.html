@@ -233,6 +233,7 @@
         <!-- 3. ADMIN PANEL MODAL -->
         <div class="glass-card hidden" id="adminPanel">
             <h3>🛡️ Cloud Visitor Logs</h3>
+            <h4 style="color: #FFD700; margin: 10px 0;">Total Visitors / Logs: <span id="totalCount">0</span></h4>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -334,8 +335,12 @@
         function loadCloudLogsTable() {
             let tbody = document.getElementById('logTableBody');
             tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>`;
+            
             db.collection("site_logs").orderBy("timestamp", "desc").get()
                 .then((querySnapshot) => {
+                    // Total visitor count update using querySnapshot.size
+                    document.getElementById('totalCount').textContent = querySnapshot.size;
+
                     tbody.innerHTML = '';
                     querySnapshot.forEach((doc) => {
                         let log = doc.data();
