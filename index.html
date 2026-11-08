@@ -86,7 +86,7 @@
         input, select {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
+            margin: 8px 0;
             border-radius: 8px;
             border: 1px solid var(--gold);
             background: rgba(15, 5, 29, 0.9);
@@ -112,6 +112,15 @@
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .switch-link {
+            color: var(--gold);
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+            display: inline-block;
+            font-size: 0.9rem;
         }
 
         /* GRID FOR DIWALI FEATURES */
@@ -169,12 +178,29 @@
 
     <div class="main-wrapper">
 
-        <!-- 1. LOGIN / ENTRY CARD -->
+        <!-- 1A. LOGIN CARD -->
         <div class="glass-card" id="loginCard">
-            <h2>🪔 Welcome to Royal Diwali 2026</h2>
-            <p style="color: #cbd5e1; margin-bottom: 15px;">Please enter your name to unlock the grand celebration.</p>
-            <input type="text" id="userNameInput" placeholder="Apna Naam Likhein (e.g. Adarsh)">
-            <button onclick="registerUserLogin()">✨ Enter Site ✨</button>
+            <h2>🪔 Royal Diwali Login</h2>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your credentials to access the celebration.</p>
+            <input type="email" id="loginEmail" placeholder="User ID / Email">
+            <input type="password" id="loginPassword" placeholder="Password / PIN">
+            <button onclick="handleLogin()">✨ Login ✨</button>
+            <br>
+            <span class="switch-link" onclick="switchToRegister()">New user? Create Profile</span>
+        </div>
+
+        <!-- 1B. REGISTRATION CARD (With Age Check < 18 Block) -->
+        <div class="glass-card hidden" id="registerCard">
+            <h2>📝 Create User Profile</h2>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Must be 18 or older to register.</p>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="number" id="regAge" placeholder="Age (e.g., 20)">
+            <input type="email" id="regEmail" placeholder="User ID / Email">
+            <input type="password" id="regPassword" placeholder="Create Password">
+            <input type="email" id="regRecovery" placeholder="Recovery Email">
+            <button onclick="handleRegister()">✨ Register Profile ✨</button>
+            <br>
+            <span class="switch-link" onclick="switchToLogin()">Already have an account? Login</span>
         </div>
 
         <!-- 2. MAIN DIWALI WEBSITE CONTENT (Revealed after login) -->
@@ -232,15 +258,15 @@
 
         <!-- 3. ADMIN PANEL MODAL -->
         <div class="glass-card hidden" id="adminPanel">
-            <h3>🛡️ Cloud Visitor Logs</h3>
-            <h4 style="color: #FFD700; margin: 10px 0;">Total Visitors / Logs: <span id="totalCount">0</span></h4>
+            <h3>🛡️ Cloud Visitor & User Logs</h3>
+            <h4 style="color: #FFD700; margin: 10px 0;">Total Records / Logs: <span id="totalCount">0</span></h4>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
                         <tr>
                             <th>Time</th>
                             <th>Name</th>
-                            <th>IP Info</th>
+                            <th>ID / Email</th>
                             <th>Activity</th>
                         </tr>
                     </thead>
@@ -281,40 +307,92 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const ADMIN_PIN = "Adarsh@2026";
+        const ADMIN_PIN = "8920";
 
-        // --- LOGIN & CLOUD LOGGING ---
-        function registerUserLogin() {
-            const name = document.getElementById('userNameInput').value.trim();
-            if (!name) {
-                alert("Please enter your name first!");
+        // --- SWITCH UI PANELS ---
+        function switchToRegister() {
+            document.getElementById('loginCard').classList.add('hidden');
+            document.getElementById('registerCard').classList.remove('hidden');
+        }
+        function switchToLogin() {
+            document.getElementById('registerCard').classList.add('hidden');
+            document.getElementById('loginCard').classList.remove('hidden');
+        }
+
+        // --- REGISTRATION LOGIC WITH AGE CHECK ---
+        function handleRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const age = parseInt(document.getElementById('regAge').value);
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value.trim();
+            const recovery = document.getElementById('regRecovery').value.trim();
+
+            if (!name || !age || !email || !password || !recovery) {
+                alert("Please fill all fields!");
                 return;
             }
 
-            fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    saveLogToCloud(name, data.ip, "Entered Diwali Site");
-                    completeLogin(name);
-                })
-                .catch(() => {
-                    saveLogToCloud(name, "IP Hidden", "Entered Diwali Site");
-                    completeLogin(name);
-                });
+            // Age Restriction Rule (< 18 block)
+            if (age < 18) {
+                alert("Access Denied: You must be 18 years or older to create an account and access this site.");
+                return;
+            }
+
+            // Save user profile in Firestore collection 'users'
+            db.collection("users").doc(email).set({
+                name: name,
+                age: age,
+                email: email,
+                password: password,
+                recovery: recovery,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert("Profile created successfully! Please login now.");
+                switchToLogin();
+            }).catch(error => {
+                alert("Error creating profile: " + error.message);
+            });
+        }
+
+        // --- LOGIN LOGIC ---
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!email || !password) {
+                alert("Please enter User ID and Password!");
+                return;
+            }
+
+            db.collection("users").doc(email).get().then((doc) => {
+                if (doc.exists) {
+                    let userData = doc.data();
+                    if (userData.password === password) {
+                        saveLogToCloud(userData.name, email, "LoggedIn to Site");
+                        completeLogin(userData.name);
+                    } else {
+                        alert("Incorrect Password!");
+                    }
+                } else {
+                    alert("User profile not found! Please register first.");
+                }
+            }).catch(error => {
+                alert("Login error: " + error.message);
+            });
         }
 
         function completeLogin(name) {
-            localStorage.setItem('current_user', name);
             document.getElementById('displayName').innerText = name;
             document.getElementById('loginCard').classList.add('hidden');
+            document.getElementById('registerCard').classList.add('hidden');
             document.getElementById('mainDashboard').classList.remove('hidden');
-            startCelebration(); // Launch fireworks automatically upon entry!
+            startCelebration();
         }
 
-        function saveLogToCloud(name, ip, activity) {
+        function saveLogToCloud(name, email, activity) {
             db.collection("site_logs").add({
                 name: name,
-                ip: ip,
+                ip: email, // storing email ID in place of IP for user identification
                 activity: activity,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(error => console.error("Cloud Error: ", error));
@@ -338,7 +416,6 @@
             
             db.collection("site_logs").orderBy("timestamp", "desc").get()
                 .then((querySnapshot) => {
-                    // Total visitor count update using querySnapshot.size
                     document.getElementById('totalCount').textContent = querySnapshot.size;
 
                     tbody.innerHTML = '';
