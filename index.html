@@ -313,21 +313,24 @@
     </div>
 
     <script>
-        // --- FIREBASE CONFIGURATION ---
+        // --- UPDATED FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyAyBR9YbGKCSa4BBIxm_Ep3GhhhMsIk3rY",
             authDomain: "diwali-database.firebaseapp.com",
             projectId: "diwali-database",
             storageBucket: "diwali-database.firebasestorage.app",
             messagingSenderId: "1091780343201",
-            appId: "1:1091780343201:web:ec2a7e39be2911cd9447e0",
-            measurementId: "G-7HM5JVWKHP"
+            appId: "1:1091780343201:web:2209a369c3f713c29447e0",
+            measurementId: "G-V7009M8LNQ"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const ADMIN_PIN = "8920";
+        
+        // FIX FOR OFFLINE / CONNECTION ISSUE
+        db.settings({ experimentalForceLongPolling: true });
 
+        const ADMIN_PIN = "8920";
         let currentActiveUser = { name: '', email: '', ip: 'Fetching...' };
 
         // --- FETCH PUBLIC IP ADDRESS ---
