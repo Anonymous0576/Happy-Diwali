@@ -39,7 +39,6 @@
             align-items: center;
         }
 
-        /* FIREWORKS CANVAS */
         #sky {
             position: fixed;
             top: 0;
@@ -66,7 +65,6 @@
             display: none !important;
         }
 
-        /* CARD UI STYLES */
         .glass-card {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
@@ -130,7 +128,6 @@
             font-size: 0.9rem;
         }
 
-        /* GRID FOR DIWALI FEATURES */
         .grid-menu {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -154,7 +151,6 @@
             color: #000;
         }
 
-        /* DISPLAY SECTION REAL IMAGES */
         .feature-img {
             width: 100%;
             max-height: 280px;
@@ -165,7 +161,6 @@
             box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
         }
 
-        /* GREETING CARD SECTION */
         #greetingCard {
             padding: 30px;
             border-radius: 12px;
@@ -176,7 +171,6 @@
         #greetingCard.purple { background: linear-gradient(135deg, #38102d, #140512); }
         #greetingCard.red { background: linear-gradient(135deg, #4a0d0d, #1a0303); }
 
-        /* ADMIN PANEL TABLE */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -189,7 +183,6 @@
 </head>
 <body>
 
-    <!-- Sky Fireworks Canvas -->
     <canvas id="sky"></canvas>
 
     <div class="main-wrapper">
@@ -214,18 +207,20 @@
             <input type="number" id="regAge" placeholder="Age (e.g., 20)">
             <input type="email" id="regEmail" placeholder="User ID / Email">
             <input type="password" id="regPassword" placeholder="Create Password">
-            <input type="email" id="regRecovery" placeholder="Recovery Email">
+            <input type="password" id="regPin" maxlength="4" placeholder="4-Digit Recovery PIN (e.g., 1234)">
             <button id="regBtn" onclick="handleRegister()">✨ Register Profile ✨</button>
             <br>
             <span class="switch-link" onclick="switchToLogin()">Already have an account? Login</span>
         </div>
 
-        <!-- 1C. SECURE FORGOT PASSWORD CARD -->
+        <!-- 1C. PIN RESET PASSWORD CARD -->
         <div class="glass-card hidden" id="forgotCard">
-            <h2>🔑 Secure Reset Verification</h2>
-            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your registered Email. We will send an official password reset link directly to your inbox.</p>
-            <input type="email" id="forgotEmail" placeholder="Registered User ID / Email">
-            <button id="forgotBtn" onclick="handleSecureResetLink()">📧 Send Verification Link</button>
+            <h2>🔑 Reset via Recovery PIN</h2>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your email and 4-digit recovery PIN to set a new password instantly.</p>
+            <input type="email" id="resetEmail" placeholder="Registered User ID / Email">
+            <input type="password" id="resetPin" maxlength="4" placeholder="4-Digit Recovery PIN">
+            <input type="password" id="newPassword" placeholder="New Password">
+            <button id="resetBtn" onclick="handlePinReset()">⚡ Update Password Now</button>
             <br>
             <span class="switch-link" onclick="switchToLogin()">Back to Login</span>
         </div>
@@ -235,14 +230,12 @@
             <h2>✨ Happy Diwali, <span id="displayName" style="color: #FFD700;"></span>! ✨</h2>
             <p id="liveClock" style="font-size: 0.9rem; color: #94a3b8;"></p>
 
-            <!-- Fireworks & Interaction Controls -->
             <div style="margin: 15px 0;">
                 <button onclick="startCelebration(); trackActivity('Launched Skyshots');">🎆 Launch Skyshots</button>
                 <button onclick="wishFountain(); trackActivity('Triggered Wish Fountain');">🌟 Golden Wish Fountain</button>
                 <button onclick="ringBell(); trackActivity('Rang Celebration Bell');">🔔 Celebration Bell</button>
             </div>
 
-            <!-- Grid Menu for Features -->
             <div class="grid-menu">
                 <button class="grid-btn" onclick="lightDiyas(); trackActivity('Lit Divine Diyas');">🪔 Divine Diyas</button>
                 <button class="grid-btn" onclick="showRangoli(); trackActivity('Viewed Royal Rangoli');">🎨 Royal Rangoli</button>
@@ -251,7 +244,6 @@
                 <button class="grid-btn" onclick="toggleParticles(); trackActivity('Toggled Particles');">✨ Particles</button>
             </div>
 
-            <!-- Dynamic Wish Generator -->
             <div style="margin-top: 25px; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 10px;">
                 <h3>📜 Festive Wishes</h3>
                 <p id="wishText" style="font-size: 1.1rem; margin: 10px 0; min-height: 50px;">May your home shine with happiness and prosperity! 🪔</p>
@@ -259,13 +251,11 @@
                 <button onclick="shareWish(); trackActivity('Shared Festive Wish');">📤 Share Wish</button>
             </div>
 
-            <!-- Display Area with Real Images -->
             <div id="displaySection" class="glass-card" hidden style="margin-top: 20px;">
                 <h3 id="displayTitle"></h3>
                 <div id="displayContent"></div>
             </div>
 
-            <!-- Custom Card Creator Area -->
             <div id="cardArea" hidden style="margin-top: 20px;">
                 <div id="greetingCard" class="gold">
                     <h2 style="color: gold;">🪔 Happy Diwali 🪔</h2>
@@ -277,7 +267,6 @@
                 <button onclick="shareCard(); trackActivity('Shared Greeting Card');">📤 Share Card</button>
             </div>
 
-            <!-- Admin Access Footer -->
             <div style="margin-top: 30px;">
                 <button style="background: transparent; border: 1px solid #64748b; color: #94a3b8; font-size: 0.8rem;" onclick="openAdminPanel()">🔐 Admin Logs</button>
             </div>
@@ -305,7 +294,6 @@
 
     </div>
 
-    <!-- CARD CREATOR MODAL -->
     <div id="cardModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
         <div class="glass-card" style="max-width: 400px;">
             <h3>💌 Create Personalized Card</h3>
@@ -321,7 +309,6 @@
     </div>
 
     <script>
-        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyAyBR9YbGKCSa4BBIxm_Ep3GhhhMsIk3rY",
             authDomain: "diwali-database.firebaseapp.com",
@@ -370,15 +357,20 @@
             const age = parseInt(document.getElementById('regAge').value);
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value.trim();
-            const recovery = document.getElementById('regRecovery').value.trim().toLowerCase();
+            const pin = document.getElementById('regPin').value.trim();
 
-            if (!name || !age || !email || !password || !recovery) {
+            if (!name || !age || !email || !password || !pin) {
                 alert("Please fill all fields!");
                 return;
             }
 
             if (age < 18) {
                 alert("Access Denied: You must be 18 years or older to create an account and access this site.");
+                return;
+            }
+
+            if (pin.length !== 4) {
+                alert("Recovery PIN must be exactly 4 digits!");
                 return;
             }
 
@@ -393,7 +385,7 @@
                         age: age,
                         email: email,
                         password: password,
-                        recovery: recovery,
+                        pin: pin,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 })
@@ -410,30 +402,46 @@
                 });
         }
 
-        function handleSecureResetLink() {
-            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+        function handlePinReset() {
+            const email = document.getElementById('resetEmail').value.trim().toLowerCase();
+            const pin = document.getElementById('resetPin').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
 
-            if (!email) {
-                alert("Please enter your registered Email address!");
+            if (!email || !pin || !newPassword) {
+                alert("Please fill all fields!");
                 return;
             }
 
-            const btn = document.getElementById('forgotBtn');
+            const btn = document.getElementById('resetBtn');
             btn.disabled = true;
-            btn.textContent = "Sending Link...";
+            btn.textContent = "Updating...";
 
-            auth.sendPasswordResetEmail(email)
-                .then(() => {
-                    alert("Verification link sent! Check your inbox/spam folder to safely reset your password.");
+            db.collection("users").doc(email).get().then((doc) => {
+                if (doc.exists) {
+                    let userData = doc.data();
+                    if (userData.pin === pin) {
+                        db.collection("users").doc(email).update({ password: newPassword })
+                            .then(() => {
+                                alert("Password updated successfully! Please login with your new password.");
+                                btn.disabled = false;
+                                btn.textContent = "⚡ Update Password Now";
+                                switchToLogin();
+                            });
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = "⚡ Update Password Now";
+                        alert("Incorrect 4-digit PIN!");
+                    }
+                } else {
                     btn.disabled = false;
-                    btn.textContent = "📧 Send Verification Link";
-                    switchToLogin();
-                })
-                .catch((error) => {
-                    btn.disabled = false;
-                    btn.textContent = "📧 Send Verification Link";
-                    alert("Reset Request Error: " + error.message);
-                });
+                    btn.textContent = "⚡ Update Password Now";
+                    alert("User account not found!");
+                }
+            }).catch(error => {
+                btn.disabled = false;
+                btn.textContent = "⚡ Update Password Now";
+                alert("Error: " + error.message);
+            });
         }
 
         function handleLogin() {
@@ -603,7 +611,6 @@
         }
         function stopCelebration() { if (celebrationTimer) { clearInterval(celebrationTimer); celebrationTimer = null; } }
 
-        // --- DIWALI FEATURES WITH 100% RELIABLE FAST IMAGES ---
         function lightDiyas() {
             showDisplay("🪔 Divine Lighting Ceremony", `
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Diya_lamp.jpg/800px-Diya_lamp.jpg" class="feature-img" alt="Diwali Diyas" onerror="this.onerror=null;this.src='https://images.pexels.com/photos/577585/pexels-photo-577585.jpeg?auto=compress&cs=tinysrgb&w=800';">
