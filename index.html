@@ -8,9 +8,10 @@
     <!-- Html2Canvas for downloading greeting cards -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Firebase App & Firestore CDNs -->
+    <!-- Firebase App, Firestore & Auth CDNs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -210,14 +211,12 @@
             <span class="switch-link" onclick="switchToLogin()">Already have an account? Login</span>
         </div>
 
-        <!-- 1C. FORGOT PASSWORD CARD -->
+        <!-- 1C. SECURE FORGOT PASSWORD CARD -->
         <div class="glass-card hidden" id="forgotCard">
-            <h2>🔑 Recover Password</h2>
-            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your registered Email and Recovery Email.</p>
+            <h2>🔑 Secure Reset Verification</h2>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your registered Email. We will send a official password reset link directly to your inbox.</p>
             <input type="email" id="forgotEmail" placeholder="Registered User ID / Email">
-            <input type="email" id="forgotRecovery" placeholder="Recovery Email">
-            <input type="password" id="newPassword" placeholder="Enter New Password">
-            <button id="forgotBtn" onclick="handlePasswordReset()">🔄 Reset Password</button>
+            <button id="forgotBtn" onclick="handleSecureResetLink()">📧 Send Verification Link</button>
             <br>
             <span class="switch-link" onclick="switchToLogin()">Back to Login</span>
         </div>
@@ -313,7 +312,7 @@
     </div>
 
     <script>
-        // --- UPDATED FIREBASE CONFIGURATION ---
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyAyBR9YbGKCSa4BBIxm_Ep3GhhhMsIk3rY",
             authDomain: "diwali-database.firebaseapp.com",
@@ -326,6 +325,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
         
         // FIX FOR OFFLINE / CONNECTION ISSUE
         db.settings({ experimentalForceLongPolling: true });
@@ -381,67 +381,56 @@
             btn.disabled = true;
             btn.textContent = "Creating Profile...";
 
-            db.collection("users").doc(email).set({
-                name: name,
-                age: age,
-                email: email,
-                password: password,
-                recovery: recovery,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                alert("Profile created successfully! Please login now.");
-                btn.disabled = false;
-                btn.textContent = "✨ Register Profile ✨";
-                switchToLogin();
-            }).catch(error => {
-                alert("Error creating profile: " + error.message);
-                btn.disabled = false;
-                btn.textContent = "✨ Register Profile ✨";
-            });
+            // Register doc in Firestore and create Firebase Auth User
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    return db.collection("users").doc(email).set({
+                        name: name,
+                        age: age,
+                        email: email,
+                        password: password,
+                        recovery: recovery,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    alert("Profile created successfully! Please login now.");
+                    btn.disabled = false;
+                    btn.textContent = "✨ Register Profile ✨";
+                    switchToLogin();
+                })
+                .catch(error => {
+                    alert("Error creating profile: " + error.message);
+                    btn.disabled = false;
+                    btn.textContent = "✨ Register Profile ✨";
+                });
         }
 
-        // --- FORGOT PASSWORD RESET LOGIC ---
-        function handlePasswordReset() {
+        // --- SECURE PASSWORD RESET (OFFICIAL VERIFICATION LINK) ---
+        function handleSecureResetLink() {
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
-            const recovery = document.getElementById('forgotRecovery').value.trim().toLowerCase();
-            const newPassword = document.getElementById('newPassword').value.trim();
 
-            if (!email || !recovery || !newPassword) {
-                alert("Please fill all fields!");
+            if (!email) {
+                alert("Please enter your registered Email address!");
                 return;
             }
 
             const btn = document.getElementById('forgotBtn');
             btn.disabled = true;
-            btn.textContent = "Verifying...";
+            btn.textContent = "Sending Link...";
 
-            db.collection("users").doc(email).get().then((doc) => {
-                if (doc.exists) {
-                    let userData = doc.data();
-                    if (userData.recovery === recovery) {
-                        db.collection("users").doc(email).update({
-                            password: newPassword
-                        }).then(() => {
-                            alert("Password successfully reset! Please login with your new password.");
-                            btn.disabled = false;
-                            btn.textContent = "🔄 Reset Password";
-                            switchToLogin();
-                        });
-                    } else {
-                        btn.disabled = false;
-                        btn.textContent = "🔄 Reset Password";
-                        alert("Recovery email does not match our records!");
-                    }
-                } else {
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    alert("Verification link sent! Check your inbox/spam folder to safely reset your password.");
                     btn.disabled = false;
-                    btn.textContent = "🔄 Reset Password";
-                    alert("User ID / Email not found!");
-                }
-            }).catch(error => {
-                btn.disabled = false;
-                btn.textContent = "🔄 Reset Password";
-                alert("Error: " + error.message);
-            });
+                    btn.textContent = "📧 Send Verification Link";
+                    switchToLogin();
+                })
+                .catch((error) => {
+                    btn.disabled = false;
+                    btn.textContent = "📧 Send Verification Link";
+                    alert("Reset Request Error: " + error.message);
+                });
         }
 
         // --- LOGIN LOGIC ---
