@@ -154,6 +154,17 @@
             color: #000;
         }
 
+        /* DISPLAY SECTION REAL IMAGES */
+        .feature-img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid var(--gold);
+            margin: 15px 0;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
         /* GREETING CARD SECTION */
         #greetingCard {
             padding: 30px;
@@ -164,8 +175,6 @@
         #greetingCard.gold { background: linear-gradient(135deg, #4a3b00, #1f1800); }
         #greetingCard.purple { background: linear-gradient(135deg, #38102d, #140512); }
         #greetingCard.red { background: linear-gradient(135deg, #4a0d0d, #1a0303); }
-
-        .big-art { font-size: 2.5rem; margin: 10px 0; }
 
         /* ADMIN PANEL TABLE */
         table {
@@ -214,7 +223,7 @@
         <!-- 1C. SECURE FORGOT PASSWORD CARD -->
         <div class="glass-card hidden" id="forgotCard">
             <h2>🔑 Secure Reset Verification</h2>
-            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your registered Email. We will send a official password reset link directly to your inbox.</p>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Enter your registered Email. We will send an official password reset link directly to your inbox.</p>
             <input type="email" id="forgotEmail" placeholder="Registered User ID / Email">
             <button id="forgotBtn" onclick="handleSecureResetLink()">📧 Send Verification Link</button>
             <br>
@@ -250,7 +259,7 @@
                 <button onclick="shareWish(); trackActivity('Shared Festive Wish');">📤 Share Wish</button>
             </div>
 
-            <!-- Display Area for Custom Sections -->
+            <!-- Display Area with Real Images -->
             <div id="displaySection" class="glass-card" hidden style="margin-top: 20px;">
                 <h3 id="displayTitle"></h3>
                 <div id="displayContent"></div>
@@ -327,13 +336,11 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
         
-        // FIX FOR OFFLINE / CONNECTION ISSUE
         db.settings({ experimentalForceLongPolling: true });
 
         const ADMIN_PIN = "8920";
         let currentActiveUser = { name: '', email: '', ip: 'Fetching...' };
 
-        // --- FETCH PUBLIC IP ADDRESS ---
         function fetchUserIP() {
             fetch('https://api.ipify.org?format=json')
                 .then(res => res.json())
@@ -342,7 +349,6 @@
         }
         fetchUserIP();
 
-        // --- SWITCH UI PANELS ---
         function switchToRegister() {
             document.getElementById('loginCard').classList.add('hidden');
             document.getElementById('forgotCard').classList.add('hidden');
@@ -359,7 +365,6 @@
             document.getElementById('forgotCard').classList.remove('hidden');
         }
 
-        // --- REGISTRATION LOGIC WITH AGE CHECK ---
         function handleRegister() {
             const name = document.getElementById('regName').value.trim();
             const age = parseInt(document.getElementById('regAge').value);
@@ -381,7 +386,6 @@
             btn.disabled = true;
             btn.textContent = "Creating Profile...";
 
-            // Register doc in Firestore and create Firebase Auth User
             auth.createUserWithEmailAndPassword(email, password)
                 .then(() => {
                     return db.collection("users").doc(email).set({
@@ -406,7 +410,6 @@
                 });
         }
 
-        // --- SECURE PASSWORD RESET (OFFICIAL VERIFICATION LINK) ---
         function handleSecureResetLink() {
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
 
@@ -433,7 +436,6 @@
                 });
         }
 
-        // --- LOGIN LOGIC ---
         function handleLogin() {
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value.trim();
@@ -479,7 +481,6 @@
             startCelebration();
         }
 
-        // --- CLOUD LOGGING FUNCTION (IP + ACTIVITY) ---
         function saveLogToCloud(activity) {
             if (!currentActiveUser.name) return;
             db.collection("site_logs").add({
@@ -495,7 +496,6 @@
             saveLogToCloud(activityName);
         }
 
-        // --- ADMIN PANEL LOGIC ---
         function openAdminPanel() {
             let pin = prompt("Enter Developer Secret PIN:");
             if (pin === ADMIN_PIN) {
@@ -529,7 +529,6 @@
                 });
         }
 
-        // --- LIVE CLOCK ---
         function updateClock() {
             document.getElementById("liveClock").textContent = new Date().toLocaleString("en-IN", {
                 weekday: "long", hour: "2-digit", minute: "2-digit", second: "2-digit"
@@ -537,7 +536,6 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // --- FIREWORK SKY ENGINE ---
         const canvas = document.getElementById("sky");
         const ctx = canvas.getContext("2d");
         let rockets = [], sparks = [], celebrationTimer = null;
@@ -605,16 +603,28 @@
         }
         function stopCelebration() { if (celebrationTimer) { clearInterval(celebrationTimer); celebrationTimer = null; } }
 
-        // --- DIWALI FEATURES ---
+        // --- DIWALI FEATURES WITH REAL HD IMAGES ---
         function lightDiyas() {
-            showDisplay("🪔 Divine Lighting Ceremony", `<div class="big-art">🪔 ✨ 🪔 ✨ 🪔</div><p>Let every diya bring hope and prosperity into your life.</p>`);
+            showDisplay("🪔 Divine Lighting Ceremony", `
+                <img src="https://images.unsplash.com/photo-1603565816030-6b3892e2fea2?auto=format&fit=crop&w=800&q=80" class="feature-img" alt="Diwali Diyas">
+                <p>Let every glowing diya bring hope, peace, and prosperity into your home.</p>
+            `);
             for (let i = 0; i < 4; i++) setTimeout(randomSkyshot, i * 300);
         }
+
         function showRangoli() {
-            showDisplay("🎨 Royal Rangoli", `<div class="big-art">🌺 🌸 🪷 🌸 🌺</div><p>Colours of tradition, beauty, and happiness!</p>`);
+            showDisplay("🎨 Royal Rangoli", `
+                <img src="https://images.unsplash.com/photo-1603228253457-41e9137d6e8b?auto=format&fit=crop&w=800&q=80" class="feature-img" alt="Diwali Rangoli">
+                <p>Intricate colours of tradition, festive beauty, and joyous celebrations!</p>
+            `);
         }
+
         function openGift() {
-            showDisplay("🎁 Royal Surprise", `<div class="big-art">🎁</div><h2 style="color:gold">You Are Special!</h2><p>May your dreams turn into reality!</p>`);
+            showDisplay("🎁 Royal Surprise", `
+                <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80" class="feature-img" alt="Diwali Gifts">
+                <h2 style="color:gold; margin-top: 10px;">You Are Special!</h2>
+                <p>May all your dreams turn into bright reality this festive season.</p>
+            `);
             setTimeout(randomSkyshot, 300);
         }
 
@@ -631,7 +641,6 @@
             else { navigator.clipboard.writeText(wish); alert("Wish copied to clipboard!"); }
         }
 
-        // --- PARTICLES ---
         let particlesEnabled = true;
         function createParticle() {
             if (!particlesEnabled) return;
@@ -652,7 +661,6 @@
             for (let i = 0; i < 6; i++) setTimeout(() => launchRocket(window.innerWidth / 2 + (Math.random() - 0.5) * 200, window.innerHeight * 0.2, "mega"), i * 150);
         }
 
-        // --- AUDIO BELL ---
         function ringBell() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -664,7 +672,10 @@
                 osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.start(); osc.stop(audioCtx.currentTime + 1.5);
             } catch (e) {}
-            showDisplay("🔔 Celebration Bell", `<div class="big-art">🔔 ✨ 🔔</div><p>May peace and happiness fill your home.</p>`);
+            showDisplay("🔔 Celebration Bell", `
+                <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=80" class="feature-img" alt="Temple Bell">
+                <p>May divine peace and happiness fill your home.</p>
+            `);
         }
 
         function showDisplay(title, content) {
@@ -675,7 +686,6 @@
             sec.scrollIntoView({ behavior: "smooth" });
         }
 
-        // --- GREETING CARD BUILDER ---
         function openCard() { document.getElementById("cardModal").style.display = "flex"; }
         function closeCard() { document.getElementById("cardModal").style.display = "none"; }
         function createCard() {
